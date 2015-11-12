@@ -1,4 +1,4 @@
-# Skeleton directory for creating Debian packages 
+# Debian packaging quick guide
 
 Simplified guide on how to build Debian packages
 
