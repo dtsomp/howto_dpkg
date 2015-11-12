@@ -29,7 +29,12 @@ What does this script do? All the boring bits:
 - compresses files
 - creates the actual package
 
-Due to laziness, the changelog.Debian is populated by dumping the git log into it.
+The changelog.Debian is populated by dumping the git log into it. 
+You will probably need something else here.
+
+I'm too lazy to hunt for the documentation files in the dir structure.
+I got'em on the top level and have the script copy them to the correct place instead.
+This is what scripts are for.
 
 ## Pre-requisite software
 
@@ -55,7 +60,9 @@ For **every** file that you add/modify, it is advisable to go through the **Modi
 If you plan to use this for any remotely serious purpose, do the following **first**:
 
 1. Remove the example files.
+
    `rm -r ROOT/var ROOT/usr`
+
 2.Edit DEBIAN/control:
  * update at least the following fields:
   + Package: this is the name of the package. Small letters, numbers and dashes. No capitals
@@ -73,7 +80,7 @@ The optional part will not cause functional problems, but will cause less warnin
 
 #### mandatory
 
-* Add file in their correct place under the ROOT directory. Create dirs as needed.
+* Add file in the correct place under the ROOT directory. Create dirs as needed.
 * Enforce permissions for the file:
  + Edit build.sh
  + Go to "TODO: fix extra permissions here"
@@ -89,18 +96,20 @@ The optional part will not cause functional problems, but will cause less warnin
 
 * Update ./DOC/copyright
 * Update the manpage (./DOC/man)
-* Update the changelog. This is not needed, so it's skipped by default.  
- + update ./DOC/changelog
+* Update the changelog. This is not required, so it's skipped by default.  
+ + update ./DOC/changelog as you see fit
  + Include the file in the package:
   - edit build.sh
   - go to `# changelog` section
   - uncomment as needed
 * Update the Debian changelog. By default this is the git log.
- + update ./DOC/changelog.Debian
+ + update ./DOC/changelog.Debian as you see fit
  + edit build.sh
-  - go to `# changelog.Debian` section
-  - comment-uncomment as needed
+ + go to `# changelog.Debian` section
+ + comment-uncomment as needed
 
+Lintian will probably complain about the formatting in the changelog files.
+That's ok, lintian complains a lot.
 
 ## Building the package
 
@@ -110,7 +119,7 @@ The optional part will not cause functional problems, but will cause less warnin
 
 Creates `target/PACKAGENAME-VERSIONNUMBER.deb`.
 
-#### Test
+#### Check result
 
 `lintian target/PACKAGENAME-VERSIONNUMBER.deb`
 
@@ -120,5 +129,5 @@ Creates `target/PACKAGENAME-VERSIONNUMBER.deb`.
 * man page is not properly formatted.
 * man page is (1) by default.
 * package is not signed.
-* lots of laziness in documentation and exception handling
+* lots of laziness in documentation and exception handling.
 
