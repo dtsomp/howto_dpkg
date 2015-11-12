@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# placeholder script, we don't have anything specific we need to do after installation.
+
+exit 0

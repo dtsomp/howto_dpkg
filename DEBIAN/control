@@ -1,0 +1,14 @@
+Package: change-this-name
+Version: 
+Architecture: all
+Essential: no
+Depends: 
+Pre-Depends: 
+Recommends: 
+Suggests: 
+Maintainer: My Name <myname@mydomain.com>
+Conflicts: 
+Replaces: 
+Provides: change-this-name
+Description: Example package
+ A more extended description is required, so here we go, this is an example package.
