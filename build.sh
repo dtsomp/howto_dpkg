@@ -29,7 +29,7 @@ cd "${MY_DIR}"
 
 
 #
-### Pre-flight checks
+# Pre-flight checks
 #
 
 [[ ! -d "./DEBIAN" ]] && echo "ERROR: No DEBIAN folder found" && exit 5
@@ -48,7 +48,7 @@ PACKAGE_NAME=` grep "^Package:" ./DEBIAN/control | awk '{print $2}' `
 echo "PACKAGE_NAME=${PACKAGE_NAME}"
 
 #
-# Arg handling
+# command-line argument handling
 #
 
 if [ $# -eq 0 ]; then
@@ -65,7 +65,8 @@ while [ $# -gt 0 ]; do
 done
 
 #
-# Cleanup existing build dir before we start
+# Cleanup existing build dir before we start,
+# just in case the script was stopped half-way through in a previous run and you have all kinds of garbage around.
 #
 
 cleanup
@@ -79,7 +80,7 @@ echo "Creating dir structure"
 mkdir -p ${BASE_DIR}/DEBIAN
 mkdir -p ${BASE_DIR}/usr/share/doc/${PACKAGE_NAME}
 mkdir -p ${BASE_DIR}/usr/share/man/man1
-# Package-specific 
+# Now copy this to a working directory
 cp -r ROOT/* ${BASE_DIR}/
 
 #
@@ -92,22 +93,26 @@ sed -i "s/^Version:.*$/Version: ${VERSION}/" ${BASE_DIR}/DEBIAN/control
 
 #
 # Create documentation
+# Replace '1' with a different number if you don't want man(1) pages.
 #
 
 cp ./DOC/copyright ${BASE_DIR}/usr/share/doc/${PACKAGE_NAME}/
 cp ./DOC/man ${BASE_DIR}/usr/share/man/man1/${PACKAGE_NAME}.1
 
 # changelog
-# uncomment to use your changelog 
+# Not mandatory to have.
+# Uncomment to use your version of the changelog 
 #cp ./DOC/changelog ${BASE_DIR}/usr/share/doc/${PACKAGE_NAME}/
 
 # changelog.Debian
-# Lazy changelog creation. Use the second line instead to use your version
+# Lazy changelog creation. Lintian will complain about formatting.
+# Use the second line instead to use your version of the file.
+#
 git log --oneline  -- . > ${BASE_DIR}/usr/share/doc/${PACKAGE_NAME}/changelog.Debian
 #cp ./DOC/changelog.Debian ${BASE_DIR}/usr/share/doc/${PACKAGE_NAME}/
 
 #
-# Some files need to be compressed
+# Some files are required in compressed form
 #
 
 gzip --best ${BASE_DIR}/usr/share/man/man1/${PACKAGE_NAME}.1
@@ -116,19 +121,23 @@ gzip --best ${BASE_DIR}/usr/share/doc/${PACKAGE_NAME}/changelog.Debian
 
 #
 # Permissions
+# All exes need to be 0755
+# Non-exes need to be 0644
 #
 
 echo "Fixing permissions"
 find ${BASE_DIR} -type d -exec chmod 0755 {} \;
 find ${BASE_DIR} -type f -exec chmod 0644 {} \;
-# All exes need to be 0755
-# Non-exes need to be 0644
 chmod 0755 ${BASE_DIR}/DEBIAN/postinst
 chmod 0755 ${BASE_DIR}/DEBIAN/prerm
 # TODO: fix extra permissions here
 
 #
 # Build
+# This is the actual build step.
+# fakeroot makes root owner of all files in the package. NOT MANDATORY. Your package might not need this.
+# (also, you can fix ownership in the postinst script)
+# 'dpkg -b BASE_DIRECTORY FINAL_PACKAGE_FILE' builds the actual file
 #
 
 echo "Building package"
@@ -136,7 +145,7 @@ DEBFILE="${PACKAGE_NAME}-${VERSION}.deb"
 { fakeroot dpkg -b ${BASE_DIR} ./target/${DEBFILE}; } || { echo "ERROR: package creation failed."; exit 1; }
 
 #
-# Finished. Let's cleanup and exit
+# Finished. Let's cleanup (again) and exit
 #
 
 cleanup
